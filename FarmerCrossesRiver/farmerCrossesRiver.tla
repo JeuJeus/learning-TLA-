@@ -55,8 +55,14 @@ RowOverToOtherSide ==
 
 ------------------------- 
 
+ThisSideCarriage == carriage_on_side[boat_side]
+OtherSideCarriage == carriage_on_side[OtherSide(boat_side)]
+
+------------------------- 
+
 UpdateCarriageStatus(new_this_side) ==
-\* I would love to write something like this, but do not know how to use variable as string value for key in struct, TLC module toString does not help
+\* I would love to write something like this, but do not know how to use 
+\* variable as string value for key in struct, TLC module toString does not help
 \*    LET not_boat_side == OtherSide(boat_side)
 \*    IN carriage_on_side' = [boat_side |-> new_this_side, not_boat_side |-> carriage_on_side["end"]]
     IF boat_side = "start"
@@ -71,38 +77,36 @@ UpdateBoatIfSafe(new_this_side, new_boat) ==
 
 ------------------------- 
 
-LoadBoat(participant,this_side,other_side) ==
+LoadBoat(participant) ==
     /\ BoatIsEmpty
-    /\  LET new_this_side == this_side \ {participant}
+    /\  LET new_this_side == ThisSideCarriage \ {participant}
             new_boat == {participant}
-            new_other_side == other_side \cup new_boat
+            new_other_side == OtherSideCarriage \cup new_boat
         IN  UpdateBoatIfSafe(new_this_side, new_boat)
                     
-SwapBoatContent(participant,this_side,other_side) ==
+SwapBoatContent(participant) ==
     /\  BoatIsLoaded
-    /\  LET new_this_side == (this_side \ {participant}) \cup boat
+    /\  LET new_this_side == (ThisSideCarriage \ {participant}) \cup boat
             new_boat == {participant}
-            new_other_side == other_side \cup new_boat        
+            new_other_side == OtherSideCarriage \cup new_boat        
         IN  UpdateBoatIfSafe(new_this_side, new_boat)
 
-ChangeBoatContent(participant,this_side,other_side) ==
+ChangeBoatContent(participant) ==
     /\  participant /= last_carriage
-    /\  \/ LoadBoat(participant,this_side,other_side)
-        \/ SwapBoatContent(participant,this_side,other_side)
-    /\  last_carriage' = participant    
+    /\  last_carriage' = participant  
+    /\  \/ LoadBoat(participant)
+        \/ SwapBoatContent(participant)
 
 UnloadBoat ==
     /\  BoatIsLoaded
-    /\  LET new_this_side == carriage_on_side[boat_side] \cup boat
+    /\  LET new_this_side == ThisSideCarriage \cup boat
             new_boat == {}
-        IN  /\ UpdateBoatIfSafe(new_this_side, new_boat)
-            /\ last_carriage' = last_carriage
-            
+        IN  /\ last_carriage' = last_carriage
+            /\ UpdateBoatIfSafe(new_this_side, new_boat)
+               
 Transport == 
-    \/  LET current_side_carriage == carriage_on_side[boat_side]
-            other_side_carriage == carriage_on_side[OtherSide(boat_side)]
-        IN \E participant \in current_side_carriage : 
-            ChangeBoatContent(participant,current_side_carriage,other_side_carriage)
+    \/  \E participant \in ThisSideCarriage : 
+            ChangeBoatContent(participant)
     \/  UnloadBoat
     \/  RowOverToOtherSide
             
@@ -121,6 +125,6 @@ NoSolution == Cardinality(carriage_on_side["end"]) < 3
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Feb 27 17:36:30 CET 2024 by JUFIGGE
+\* Last modified Wed Feb 28 07:40:06 CET 2024 by JUFIGGE
 \* Last modified Tue Feb 27 17:34:16 CET 2024 by JeuJeus
 \* Created Mon Feb 26 12:41:56 CET 2024 by JeuJeus
