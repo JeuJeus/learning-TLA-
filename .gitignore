@@ -26,3 +26,6 @@
 
 # Vim backup file
 *~
+.vscode/settings.json
+**/states/**
+**/*.out

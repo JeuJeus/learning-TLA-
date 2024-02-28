@@ -1,4 +1,4 @@
-------------------------- MODULE FarmerCrossesRiver -------------------------
+------------------------- MODULE farmerCrossesRiver -------------------------
 EXTENDS Integers, FiniteSets
 
 \*A farmer stands in front of a large river. It has no bridge. There is a fence on the other side.
