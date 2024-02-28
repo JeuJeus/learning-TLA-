@@ -47,16 +47,7 @@ OtherSide(bs) == CHOOSE s \in boat_docks : s /= bs
 BoatIsEmpty == Cardinality(boat) = 0
 BoatIsLoaded == Cardinality(boat) = 1
     
-RowOverToOtherSide == 
-    /\ boat_side' = OtherSide(boat_side) 
-    /\ carriage_on_side' = carriage_on_side
-    /\ boat' = boat
-    /\ last_carriage' = last_carriage
-
-------------------------- 
-
 ThisSideCarriage == carriage_on_side[boat_side]
-OtherSideCarriage == carriage_on_side[OtherSide(boat_side)]
 
 ------------------------- 
 
@@ -72,30 +63,17 @@ UpdateCarriageStatus(new_this_side) ==
 UpdateBoatIfSafe(new_this_side, new_boat) ==
     /\ Safe(new_this_side)
     /\ boat' = new_boat
-    /\ boat_side' = boat_side
+    /\ UNCHANGED boat_side
     /\ UpdateCarriageStatus(new_this_side)
 
 ------------------------- 
 
-LoadBoat(participant) ==
-    /\ BoatIsEmpty
-    /\  LET new_this_side == ThisSideCarriage \ {participant}
-            new_boat == {participant}
-            new_other_side == OtherSideCarriage \cup new_boat
-        IN  UpdateBoatIfSafe(new_this_side, new_boat)
-                    
-SwapBoatContent(participant) ==
-    /\  BoatIsLoaded
-    /\  LET new_this_side == (ThisSideCarriage \ {participant}) \cup boat
-            new_boat == {participant}
-            new_other_side == OtherSideCarriage \cup new_boat        
-        IN  UpdateBoatIfSafe(new_this_side, new_boat)
-
 ChangeBoatContent(participant) ==
     /\  participant /= last_carriage
-    /\  last_carriage' = participant  
-    /\  \/ LoadBoat(participant)
-        \/ SwapBoatContent(participant)
+    /\  LET new_this_side == (ThisSideCarriage \ {participant}) \cup boat
+            new_boat == {participant}
+        IN  /\  last_carriage' = participant  
+            /\ UpdateBoatIfSafe(new_this_side, new_boat)
 
 UnloadBoat ==
     /\  BoatIsLoaded
@@ -103,10 +81,13 @@ UnloadBoat ==
             new_boat == {}
         IN  /\ last_carriage' = last_carriage
             /\ UpdateBoatIfSafe(new_this_side, new_boat)
+
+RowOverToOtherSide == 
+    /\ boat_side' = OtherSide(boat_side) 
+    /\ UNCHANGED <<carriage_on_side, boat, last_carriage>>
                
 Transport == 
-    \/  \E participant \in ThisSideCarriage : 
-            ChangeBoatContent(participant)
+    \/  \E participant \in ThisSideCarriage : ChangeBoatContent(participant)
     \/  UnloadBoat
     \/  RowOverToOtherSide
             
@@ -125,6 +106,6 @@ NoSolution == Cardinality(carriage_on_side["end"]) < 3
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Feb 28 07:40:06 CET 2024 by JUFIGGE
+\* Last modified Wed Feb 28 08:17:55 CET 2024 by JUFIGGE
 \* Last modified Tue Feb 27 17:34:16 CET 2024 by JeuJeus
 \* Created Mon Feb 26 12:41:56 CET 2024 by JeuJeus
