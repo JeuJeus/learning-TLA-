@@ -2,30 +2,31 @@
 
 # TLA+ Toolbox
 # Exclude all files related to TLA+ Toolbox
-# *.toolbox/**
+**/*.toolbox/**
 
-*.toolbox/*.launch
-*.toolbox/*.pmap
+**/*.toolbox/*.launch
+**/*.toolbox/*.pmap
 
 # TLA+ Toolbox models
-*.toolbox/**/*.tla
-*.toolbox/**/*.out
-*.toolbox/**/*.cfg
+**/*.toolbox/**/*.tla
+**/*.toolbox/**/*.out
+**/*.toolbox/**/*.cfg
 
 # PlusCal
-*.old
+**/*.old
 
 # LaTex output
-*.toolbox/*aux
-*.toolbox/*.log
-*.toolbox/*.pdf
-*.toolbox/*.tex
-*aux
-*.log
-*.tex
+**/*.toolbox/*aux
+**/*.toolbox/*.log
+**/*.toolbox/*.pdf
+**/*.toolbox/*.tex
+**/*aux
+**/*.log
+**/*.tex
 
 # Vim backup file
 *~
+
 .vscode/settings.json
 **/states/**
 **/*.out
