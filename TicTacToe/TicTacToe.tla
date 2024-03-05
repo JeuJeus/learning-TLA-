@@ -1,4 +1,4 @@
------------------------------ MODULE tictactoe -----------------------------
+----------------------------- MODULE TicTacToe -----------------------------
 EXTENDS Sequences, Integers
 
 \* This module serves to emulate a tic-tac-toe-game

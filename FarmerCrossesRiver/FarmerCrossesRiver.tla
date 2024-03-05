@@ -1,4 +1,4 @@
-------------------------- MODULE farmerCrossesRiver -------------------------
+------------------------- MODULE FarmerCrossesRiver -------------------------
 EXTENDS Integers, FiniteSets
 
 \*A farmer stands in front of a large river. It has no bridge. There is a fence on the other side.
@@ -106,6 +106,7 @@ NoSolution == Cardinality(carriage_on_side["end"]) < 3
 
 =============================================================================
 \* Modification History
+\* Last modified Tue Mar 05 16:49:27 CET 2024 by jeujeus
 \* Last modified Wed Feb 28 08:17:55 CET 2024 by JUFIGGE
 \* Last modified Tue Feb 27 17:34:16 CET 2024 by JeuJeus
 \* Created Mon Feb 26 12:41:56 CET 2024 by JeuJeus
