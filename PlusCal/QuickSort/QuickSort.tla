@@ -4,7 +4,7 @@ EXTENDS Sequences, Integers, TLC
 CONSTANT listLength
 ASSUME listLength \in Nat
 
-(*--algorithm quicksort {
+(*--fair algorithm quicksort {
     variables
         indices = 0..listLength,
         values = indices,
@@ -53,7 +53,7 @@ ASSUME listLength \in Nat
     }
 
 }*)
-\* BEGIN TRANSLATION (chksum(pcal) = "62fb6ce4" /\ chksum(tla) = "15f114fc")
+\* BEGIN TRANSLATION (chksum(pcal) = "62fb6ce4" /\ chksum(tla) = "3182fe21")
 \* Parameter low of procedure partition at line 14 col 25 changed to low_
 \* Parameter high of procedure partition at line 14 col 33 changed to high_
 VARIABLES indices, values, listToSort, partitionIndex, pc, stack, low_, high_, 
@@ -205,7 +205,8 @@ Terminating == pc = "Done" /\ UNCHANGED vars
 Next == partition \/ quickSort \/ Lbl_9 \/ Lbl_10
            \/ Terminating
 
-Spec == Init /\ [][Next]_vars
+Spec == /\ Init /\ [][Next]_vars
+        /\ WF_vars(Next)
 
 Termination == <>(pc = "Done")
 
@@ -213,5 +214,5 @@ Termination == <>(pc = "Done")
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Mar 13 09:00:34 CET 2024 by jeujeus
+\* Last modified Wed Mar 13 09:06:18 CET 2024 by jeujeus
 \* Created Tue Mar 12 18:38:34 CET 2024 by jeujeus
