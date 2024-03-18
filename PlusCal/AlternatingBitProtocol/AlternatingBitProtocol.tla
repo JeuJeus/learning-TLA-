@@ -3,7 +3,10 @@ EXTENDS Integers, Sequences, TLC
 
 CONSTANT Data
  
-RemoveElement(i, sequence) == [j \in 1..(Len(sequence)-1) |-> IF j < i THEN sequence[j] ELSE sequence[j+1]]
+RemoveElement(i, sequence) == 
+    [j \in 1..(Len(sequence)-1) |-> 
+        IF j < i THEN sequence[j] 
+            ELSE sequence[j+1]]
                                 
 Messages == [data : Data, bit : {0,1}]
 
@@ -146,10 +149,8 @@ AB_TypeOK ==
 EqualityInvariant == (bToA # << >>) /\ (Head(bToA) = aVar.bit) => (aVar = bVar)
 
 IsConcatenationOfTwoSingleValues(sequence,x,y) == 
-        LET xSequence == <<x>>
-            ySequence == <<y>>
-        IN \E i \in 0..Len(sequence) :
-            \A j \in 1..Len(sequence) : sequence[j] = IF j <= i THEN x ELSE y
+    \E i \in 0..Len(sequence) :
+        \A j \in 1..Len(sequence) : sequence[j] = IF j <= i THEN x ELSE y
 
 IsConcatenationOfTwoSingleValuesFromType(sequence, allowedType) == 
     \E x,y \in allowedType : IsConcatenationOfTwoSingleValues(sequence,x,y)             
@@ -163,5 +164,5 @@ AB_Spec == INSTANCE AlternatingBitSpec
         
 =============================================================================
 \* Modification History
-\* Last modified Mon Mar 18 14:17:51 CET 2024 by jeujeus
+\* Last modified Mon Mar 18 14:19:44 CET 2024 by jeujeus
 \* Created Fri Mar 15 12:00:55 CET 2024 by jeujeus
