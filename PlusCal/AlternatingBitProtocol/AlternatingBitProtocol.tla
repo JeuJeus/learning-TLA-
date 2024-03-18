@@ -145,9 +145,23 @@ AB_TypeOK ==
 
 EqualityInvariant == (bToA # << >>) /\ (Head(bToA) = aVar.bit) => (aVar = bVar)
 
+IsConcatenationOfTwoSingleValues(sequence,x,y) == 
+        LET xSequence == <<x>>
+            ySequence == <<y>>
+        IN \E i \in 0..Len(sequence) :
+            \A j \in 1..Len(sequence) : sequence[j] = IF j <= i THEN x ELSE y
+
+IsConcatenationOfTwoSingleValuesFromType(sequence, allowedType) == 
+    \E x,y \in allowedType : IsConcatenationOfTwoSingleValues(sequence,x,y)             
+
+ConcatenationInvariant == 
+        /\ IsConcatenationOfTwoSingleValuesFromType(aToB, Messages) 
+        /\ IsConcatenationOfTwoSingleValuesFromType(bToA, {0,1}) 
+    
+
 AB_Spec == INSTANCE AlternatingBitSpec
         
 =============================================================================
 \* Modification History
-\* Last modified Mon Mar 18 11:15:12 CET 2024 by jeujeus
+\* Last modified Mon Mar 18 14:17:51 CET 2024 by jeujeus
 \* Created Fri Mar 15 12:00:55 CET 2024 by jeujeus
