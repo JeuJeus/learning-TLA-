@@ -8,6 +8,7 @@ In this repo I document my first steps.
 | PlusCal | [ExponentiationOperator](PlusCal/ExponentiationOperator) |
 | PlusCal | [NAlternatingTurns](PlusCal/NAlternatingTurns) |
 | PlusCal | [QuickSort](PlusCal/QuickSort) |
+| PlusCal | [AlternatingBitProtocol](PlusCal/AlternatingBitProtocol) |
 | TLA+ | [FarmerCrossesRiver](TLA+/FarmerCrossesRiver) |
 | TLA+ | [SieveOfEratosthenes](TLA+/SieveOfEratosthenes) |
 | TLA+ | [TicTacToe](TLA+/TicTacToe) |
