@@ -157,12 +157,11 @@ IsConcatenationOfTwoSingleValuesFromType(sequence, allowedType) ==
 
 ConcatenationInvariant == 
         /\ IsConcatenationOfTwoSingleValuesFromType(aToB, Messages) 
-        /\ IsConcatenationOfTwoSingleValuesFromType(bToA, {0,1}) 
-    
+        /\ IsConcatenationOfTwoSingleValuesFromType(bToA, {0,1})   
 
 AB_Spec == INSTANCE AlternatingBitSpec
         
 =============================================================================
 \* Modification History
-\* Last modified Mon Mar 18 14:19:44 CET 2024 by jeujeus
+\* Last modified Mon Mar 18 14:47:01 CET 2024 by jeujeus
 \* Created Fri Mar 15 12:00:55 CET 2024 by jeujeus
