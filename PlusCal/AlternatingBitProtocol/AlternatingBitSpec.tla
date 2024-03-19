@@ -5,7 +5,7 @@ CONSTANT Data
 
 Messages == [data: Data, bit : {0,1}]
 
-(* --algorithm abSpec {
+(* --fair algorithm abSpec {
 
     variables
         aVar \in {m \in Messages : m.bit = 1},
@@ -33,7 +33,7 @@ Messages == [data: Data, bit : {0,1}]
    
 
 }*)
-\* BEGIN TRANSLATION (chksum(pcal) = "71887f2" /\ chksum(tla) = "97121124")
+\* BEGIN TRANSLATION (chksum(pcal) = "71887f2" /\ chksum(tla) = "3d789315")
 VARIABLES aVar, bVar
 
 vars == << aVar, bVar >>
@@ -56,14 +56,20 @@ B == /\ aVar.bit /= bVar.bit
 
 Next == A \/ B
 
-Spec == Init /\ [][Next]_vars
+Spec == /\ Init /\ [][Next]_vars
+        /\ WF_vars(Next)
 
 \* END TRANSLATION 
 
 ABSpec_TypeOK == (aVar \in Messages) /\ (bVar \in Messages)
 
 EqualityInvariant == (aVar.bit = bVar.bit) => (aVar = bVar)
+
+VariablesChanging == 
+    /\ []<>(aVar = bVar) 
+    /\ []<>(aVar /= bVar) 
+
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 15 12:04:46 CET 2024 by jeujeus
+\* Last modified Tue Mar 19 15:09:35 CET 2024 by jeujeus
 \* Created Thu Mar 14 12:31:59 CET 2024 by jeujeus
