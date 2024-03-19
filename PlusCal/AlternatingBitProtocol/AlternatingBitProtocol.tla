@@ -49,34 +49,42 @@ Messages == [data : Data, bit : {0,1}]
         bToA := RemoveElement(i, bToA)
     }
     
-    process(A = "A") {
-        a:  while(TRUE) {
-                either { 
-                    aSendMsgToB() 
-                } or {
-                    await bToA /= << >>;
-                    if(Head(bToA) = aVar.bit) {
-                        with (d \in Data) {
-                            aSetNewMessageToBeSent()
-                        }
-                    };
-                    markMessageAsRecievedFromBToA()
-                }      
-            }
+    fair process(ASend = "ASend") {
+        aSend:  
+            while(TRUE) {
+                aSendMsgToB() 
+            } 
+    }
+    
+    fair+ process(AReceive = "AReceive") {
+        aReceive:  
+            while(TRUE) {
+                await bToA /= << >>;
+                if(Head(bToA) = aVar.bit) {
+                    with (d \in Data) {
+                        aSetNewMessageToBeSent()
+                    }
+                };
+                markMessageAsRecievedFromBToA()
+            }      
     }
 
-    process(B = "B") {
-        b:  while(TRUE){
-                either {
-                    bSentAckToA()
-                } or {
-                    await aToB /= << >>;
-                    if(Head(aToB).bit /= bVar.bit) {
-                        setExpectedMessage()
-                    };
-                    markMessageAsRecievedFromAToB()
-                }
-            }
+    fair process(BSend = "BSend") {
+        bSend:  
+            while(TRUE) {
+                bSentAckToA() 
+            } 
+    }
+    
+    fair+ process(BReceive = "BReceive") {
+        bReceive:  
+            while(TRUE) {
+                await aToB /= << >>;
+                if(Head(aToB).bit /= bVar.bit) {
+                    setExpectedMessage()
+                };
+                markMessageAsRecievedFromAToB()
+            }      
     }
     
     process(LoseMessages = "L") {
@@ -90,12 +98,12 @@ Messages == [data : Data, bit : {0,1}]
     }
 
 }*)
-\* BEGIN TRANSLATION (chksum(pcal) = "246eeb0e" /\ chksum(tla) = "a28b4a06")
+\* BEGIN TRANSLATION (chksum(pcal) = "4e87c7cb" /\ chksum(tla) = "f004f6b1")
 VARIABLES aVar, bVar, aToB, bToA
 
 vars == << aVar, bVar, aToB, bToA >>
 
-ProcSet == {"A"} \cup {"B"} \cup {"L"}
+ProcSet == {"ASend"} \cup {"AReceive"} \cup {"BSend"} \cup {"BReceive"} \cup {"L"}
 
 Init == (* Global variables *)
         /\ aVar \in Messages
@@ -103,28 +111,28 @@ Init == (* Global variables *)
         /\ aToB = << >>
         /\ bToA = << >>
 
-A == /\ \/ /\ aToB' = Append(aToB, aVar)
-           /\ UNCHANGED <<aVar, bToA>>
-        \/ /\ bToA /= << >>
-           /\ IF Head(bToA) = aVar.bit
-                 THEN /\ \E d \in Data:
-                           aVar' = [data |-> d, bit |-> 1 - aVar.bit]
-                 ELSE /\ TRUE
-                      /\ aVar' = aVar
-           /\ bToA' = Tail(bToA)
-           /\ aToB' = aToB
-     /\ bVar' = bVar
+ASend == /\ aToB' = Append(aToB, aVar)
+         /\ UNCHANGED << aVar, bVar, bToA >>
 
-B == /\ \/ /\ bToA' = Append(bToA, bVar.bit)
-           /\ UNCHANGED <<bVar, aToB>>
-        \/ /\ aToB /= << >>
-           /\ IF Head(aToB).bit /= bVar.bit
-                 THEN /\ bVar' = Head(aToB)
-                 ELSE /\ TRUE
-                      /\ bVar' = bVar
-           /\ aToB' = Tail(aToB)
-           /\ bToA' = bToA
-     /\ aVar' = aVar
+AReceive == /\ bToA /= << >>
+            /\ IF Head(bToA) = aVar.bit
+                  THEN /\ \E d \in Data:
+                            aVar' = [data |-> d, bit |-> 1 - aVar.bit]
+                  ELSE /\ TRUE
+                       /\ aVar' = aVar
+            /\ bToA' = Tail(bToA)
+            /\ UNCHANGED << bVar, aToB >>
+
+BSend == /\ bToA' = Append(bToA, bVar.bit)
+         /\ UNCHANGED << aVar, bVar, aToB >>
+
+BReceive == /\ aToB /= << >>
+            /\ IF Head(aToB).bit /= bVar.bit
+                  THEN /\ bVar' = Head(aToB)
+                  ELSE /\ TRUE
+                       /\ bVar' = bVar
+            /\ aToB' = Tail(aToB)
+            /\ UNCHANGED << aVar, bToA >>
 
 LoseMessages == /\ \/ /\ \E i \in 1..Len(aToB):
                            aToB' = RemoveElement(i, aToB)
@@ -134,9 +142,13 @@ LoseMessages == /\ \/ /\ \E i \in 1..Len(aToB):
                       /\ aToB' = aToB
                 /\ UNCHANGED << aVar, bVar >>
 
-Next == A \/ B \/ LoseMessages
+Next == ASend \/ AReceive \/ BSend \/ BReceive \/ LoseMessages
 
-Spec == Init /\ [][Next]_vars
+Spec == /\ Init /\ [][Next]_vars
+        /\ WF_vars(ASend)
+        /\ SF_vars(AReceive)
+        /\ WF_vars(BSend)
+        /\ SF_vars(BReceive)
 
 \* END TRANSLATION 
 
@@ -163,5 +175,5 @@ AB_Spec == INSTANCE AlternatingBitSpec
         
 =============================================================================
 \* Modification History
-\* Last modified Mon Mar 18 14:47:01 CET 2024 by jeujeus
+\* Last modified Tue Mar 19 15:47:44 CET 2024 by jeujeus
 \* Created Fri Mar 15 12:00:55 CET 2024 by jeujeus
