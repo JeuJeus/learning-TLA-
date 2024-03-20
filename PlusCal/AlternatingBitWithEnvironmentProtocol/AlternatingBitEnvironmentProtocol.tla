@@ -14,7 +14,8 @@ Messages == [data : Data, bit : {0,1}]
     variables 
         aVar \in Messages,
         bVar = aVar,
-        eVar = << >>,
+        eVar \in Data,
+        eQueue = << >>,
         aToB = << >>,
         bToA = << >>;
         
@@ -23,8 +24,8 @@ Messages == [data : Data, bit : {0,1}]
     }
     
     macro aSetNewMessageToBeSent() {
-        aVar := [data |-> Head(eVar), bit |-> 1 - aVar.bit];
-        eVar := Tail(eVar);
+        aVar := [data |-> Head(eQueue), bit |-> 1 - aVar.bit];
+        eQueue := Tail(eQueue);
     }
     
     macro markMessageAsRecievedFromBToA(){
@@ -44,7 +45,8 @@ Messages == [data : Data, bit : {0,1}]
     }
     
     macro eChooseMsg(data) {
-        eVar := Append(eVar,data)
+        eVar := data;
+        eQueue := Append(eQueue,eVar)
     }
     
     macro looseSomeMsgFromAToB(i){
@@ -67,7 +69,7 @@ Messages == [data : Data, bit : {0,1}]
             while(TRUE) {
                 await bToA /= << >>;
                 if(Head(bToA) = aVar.bit) {
-                    await eVar /= <<>>;
+                    await eQueue /= <<>>;
                     aSetNewMessageToBeSent()                    
                 };
                 markMessageAsRecievedFromBToA()
@@ -111,35 +113,36 @@ Messages == [data : Data, bit : {0,1}]
     }
 
 }*)
-\* BEGIN TRANSLATION (chksum(pcal) = "d1feb3b9" /\ chksum(tla) = "d133a101")
-VARIABLES aVar, bVar, eVar, aToB, bToA
+\* BEGIN TRANSLATION (chksum(pcal) = "7492a03d" /\ chksum(tla) = "bb4df935")
+VARIABLES aVar, bVar, eVar, eQueue, aToB, bToA
 
-vars == << aVar, bVar, eVar, aToB, bToA >>
+vars == << aVar, bVar, eVar, eQueue, aToB, bToA >>
 
 ProcSet == {"ASend"} \cup {"AReceive"} \cup {"BSend"} \cup {"BReceive"} \cup {"E"} \cup {"L"}
 
 Init == (* Global variables *)
         /\ aVar \in Messages
         /\ bVar = aVar
-        /\ eVar = << >>
+        /\ eVar \in Data
+        /\ eQueue = << >>
         /\ aToB = << >>
         /\ bToA = << >>
 
 ASend == /\ aToB' = Append(aToB, aVar)
-         /\ UNCHANGED << aVar, bVar, eVar, bToA >>
+         /\ UNCHANGED << aVar, bVar, eVar, eQueue, bToA >>
 
 AReceive == /\ bToA /= << >>
             /\ IF Head(bToA) = aVar.bit
-                  THEN /\ eVar /= <<>>
-                       /\ aVar' = [data |-> Head(eVar), bit |-> 1 - aVar.bit]
-                       /\ eVar' = Tail(eVar)
+                  THEN /\ eQueue /= <<>>
+                       /\ aVar' = [data |-> Head(eQueue), bit |-> 1 - aVar.bit]
+                       /\ eQueue' = Tail(eQueue)
                   ELSE /\ TRUE
-                       /\ UNCHANGED << aVar, eVar >>
+                       /\ UNCHANGED << aVar, eQueue >>
             /\ bToA' = Tail(bToA)
-            /\ UNCHANGED << bVar, aToB >>
+            /\ UNCHANGED << bVar, eVar, aToB >>
 
 BSend == /\ bToA' = Append(bToA, bVar.bit)
-         /\ UNCHANGED << aVar, bVar, eVar, aToB >>
+         /\ UNCHANGED << aVar, bVar, eVar, eQueue, aToB >>
 
 BReceive == /\ aToB /= << >>
             /\ IF Head(aToB).bit /= bVar.bit
@@ -147,10 +150,11 @@ BReceive == /\ aToB /= << >>
                   ELSE /\ TRUE
                        /\ bVar' = bVar
             /\ aToB' = Tail(aToB)
-            /\ UNCHANGED << aVar, eVar, bToA >>
+            /\ UNCHANGED << aVar, eVar, eQueue, bToA >>
 
 chooseMessage == /\ \E d \in Data:
-                      eVar' = Append(eVar,d)
+                      /\ eVar' = d
+                      /\ eQueue' = Append(eQueue,eVar')
                  /\ UNCHANGED << aVar, bVar, aToB, bToA >>
 
 LoseMessages == /\ \/ /\ \E i \in 1..Len(aToB):
@@ -159,7 +163,7 @@ LoseMessages == /\ \/ /\ \E i \in 1..Len(aToB):
                    \/ /\ \E i \in 1..Len(bToA):
                            bToA' = RemoveElement(i, bToA)
                       /\ aToB' = aToB
-                /\ UNCHANGED << aVar, bVar, eVar >>
+                /\ UNCHANGED << aVar, bVar, eVar, eQueue >>
 
 Next == ASend \/ AReceive \/ BSend \/ BReceive \/ chooseMessage
            \/ LoseMessages
@@ -176,7 +180,8 @@ Spec == /\ Init /\ [][Next]_vars
 ABE_TypeOK == 
     /\ aVar \in Messages
     /\ bVar \in Messages
-    /\ eVar \in Seq(Data)
+    /\ eVar \in Data
+    /\ eQueue \in Seq(Data)
     /\ aToB \in Seq(Messages)
     /\ bToA \in Seq({0,1})
 
@@ -197,5 +202,5 @@ ABE_Spec == INSTANCE AlternatingBitEnvironmentSpec
         
 =============================================================================
 \* Modification History
-\* Last modified Wed Mar 20 09:11:18 CET 2024 by jeujeus
+\* Last modified Wed Mar 20 09:23:52 CET 2024 by jeujeus
 \* Created Fri Mar 15 12:00:55 CET 2024 by jeujeus
