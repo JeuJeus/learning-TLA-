@@ -9,6 +9,7 @@ In this repo I document my first steps.
 | PlusCal | [NAlternatingTurns](PlusCal/NAlternatingTurns) |
 | PlusCal | [QuickSort](PlusCal/QuickSort) |
 | PlusCal | [AlternatingBitProtocol](PlusCal/AlternatingBitProtocol) |
+| PlusCal | [AlternatingBitWithEnvironmentProtocol](PlusCal/AlternatingBitWithEnvironmentProtocol) |
 | TLA+ | [FarmerCrossesRiver](TLA+/FarmerCrossesRiver) |
 | TLA+ | [SieveOfEratosthenes](TLA+/SieveOfEratosthenes) |
 | TLA+ | [TicTacToe](TLA+/TicTacToe) |
