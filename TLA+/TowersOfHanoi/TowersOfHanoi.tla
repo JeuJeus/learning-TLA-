@@ -22,8 +22,16 @@
     - Disks can not be placed on top of a smaller disk 
     
  ***************************************************************************)
- 
 EXTENDS Naturals, Sequences, TLC
+
+------------------------- 
+
+FlattenSeq(seqs) ==
+  \* From TLA+ CommunityModules SequencesExt                                           
+  IF Len(seqs) = 0 THEN seqs ELSE
+    LET flatten[i \in 1..Len(seqs)] ==
+        IF i = 1 THEN seqs[i] ELSE flatten[i-1] \o seqs[i]
+    IN flatten[Len(seqs)] 
 
 ------------------------- 
 
@@ -33,13 +41,15 @@ ASSUME NumberOfDisks \in Nat
 ------------------------- 
 
 CorrectTower[disk \in 1..NumberOfDisks] == disk
-InitialPuzzle[tower \in 1..3] == IF tower = 1 THEN CorrectTower ELSE <<>>
+InitialPuzzle[tower \in 1..3] == 
+    IF tower = 1 
+        THEN CorrectTower 
+    ELSE <<>>
 
 VARIABLE Towers    
 TowerDomain == DOMAIN Towers
     
-Init ==
-    Towers = InitialPuzzle
+Init == Towers = InitialPuzzle
 
 ------------------------- 
     
@@ -50,10 +60,12 @@ DiskIsSmallerOrTowerIsEmpty(towerFrom,towerTo) ==
         topElementOfTarget == Head(towerTo)
     IN  IF TargetTowerIsEmpty(towerTo) 
             THEN TRUE 
-            ELSE topElementOfTarget > topElementOfOrigin 
+        ELSE topElementOfTarget > topElementOfOrigin 
+
+OriginTowerIsNotEmpty(towerFrom) == towerFrom /= <<>>
 
 CanMoveDisk(towerFrom,towerTo) == 
-    /\ towerFrom /= <<>>
+    /\ OriginTowerIsNotEmpty(towerFrom)
     /\ DiskIsSmallerOrTowerIsEmpty(towerFrom,towerTo)
 
 -------------------------    
@@ -74,19 +86,33 @@ Next ==
             /\ MoveDisk(from,to,towerFrom,towerTo)
 
 -------------------------
+
+IsSorted(tower) ==
+  \A i, j \in 1..Len(tower):
+    i < j => tower[i] <= tower[j]
+
+OnlyContainsAllowedNumberOfDisks == 
+    Len(FlattenSeq(Towers)) = 5
+
+TypeOK == 
+    /\  \A tower \in TowerDomain :
+            LET towerToCheck == Towers[tower]
+            IN  /\ IsSorted(towerToCheck)
+                /\ Len(towerToCheck) <= NumberOfDisks
+    /\ OnlyContainsAllowedNumberOfDisks
+    
+-------------------------
         
 Spec == 
     /\ Init 
     /\ [][Next]_Towers 
-        
+
+THEOREM Spec => []TypeOK
+
+-------------------------
+
 InvariantOrElseFinished == 
     Towers[3] /= CorrectTower
-
-\* OnlyContainAllowedDisks ==
-\*     [tower \in Towers : Len(tower)]
-\* \A Len(Sum(Towers)) = NumberOfDisks
-
-\* TODO introduce invariants
 
 =============================================================================
 \* Modification History
