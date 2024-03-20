@@ -13,3 +13,4 @@ In this repo I document my first steps.
 | TLA+ | [FarmerCrossesRiver](TLA+/FarmerCrossesRiver) |
 | TLA+ | [SieveOfEratosthenes](TLA+/SieveOfEratosthenes) |
 | TLA+ | [TicTacToe](TLA+/TicTacToe) |
+| TLA+ | [TowersOfHanoi](TLA+/TowersOfHanoi) |
