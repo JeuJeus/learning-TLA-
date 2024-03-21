@@ -22,39 +22,26 @@
     - Disks can not be placed on top of a smaller disk 
     
  ***************************************************************************)
-EXTENDS Naturals, Sequences
+EXTENDS Naturals, Sequences, TLC
 
 CONSTANT NumberOfDisks
 ASSUME NumberOfDisks \in Nat
 
-InitialFirstTowers == 
-    [1..NumberOfDisks -> NumberOfDisks..1]
-    
-EmptyTower == << >>
-
 (*--algorithm towersOfHanoi {
-    variables
-        initialTower \in InitialFirstTowers,
-        pillars = [first |-> initialTower, second |-> EmptyTower, third |-> EmptyTower];
-    
     {
         skip;
     }
 }*)
-\* BEGIN TRANSLATION (chksum(pcal) = "a82e5b1a" /\ chksum(tla) = "9723711d")
-VARIABLES initialTower, pillars, pc
+\* BEGIN TRANSLATION (chksum(pcal) = "f5c934fa" /\ chksum(tla) = "af3d9146")
+VARIABLE pc
 
-vars == << initialTower, pillars, pc >>
+vars == << pc >>
 
-Init == (* Global variables *)
-        /\ initialTower \in InitialFirstTowers
-        /\ pillars = [first |-> initialTower, second |-> EmptyTower, third |-> EmptyTower]
-        /\ pc = "Lbl_1"
+Init == /\ pc = "Lbl_1"
 
 Lbl_1 == /\ pc = "Lbl_1"
          /\ TRUE
          /\ pc' = "Done"
-         /\ UNCHANGED << initialTower, pillars >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
@@ -71,5 +58,5 @@ Termination == <>(pc = "Done")
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Mar 20 10:10:54 CET 2024 by jeujeus
+\* Last modified Thu Mar 21 07:39:59 CET 2024 by jeujeus
 \* Created Wed Mar 20 09:29:51 CET 2024 by jeujeus
