@@ -24,6 +24,17 @@
  ***************************************************************************)
 EXTENDS Naturals, Sequences, TLC
 
+------------------------- 
+
+FlattenSeq(seqs) ==
+  \* From TLA+ CommunityModules SequencesExt                                           
+  IF Len(seqs) = 0 THEN seqs ELSE
+    LET flatten[i \in 1..Len(seqs)] ==
+        IF i = 1 THEN seqs[i] ELSE flatten[i-1] \o seqs[i]
+    IN flatten[Len(seqs)] 
+
+------------------------- 
+
 CONSTANT NumberOfDisks
 ASSUME NumberOfDisks \in Nat
 
@@ -180,7 +191,21 @@ Next == checkValidityAndMove \/ move \/ Lbl_4
 Spec == Init /\ [][Next]_vars
 
 \* END TRANSLATION 
+IsSorted(tower) ==
+  \A i, j \in 1..Len(tower):
+    i < j => tower[i] <= tower[j]
 
+OnlyContainsAllowedNumberOfDisks == 
+    Len(FlattenSeq(towers)) = 5
+
+TypeOK == 
+    /\  \A tower \in towersDomain :
+            LET towerToCheck == towers[tower]
+            IN  /\ IsSorted(towerToCheck)
+                /\ Len(towerToCheck) <= NumberOfDisks
+    /\ OnlyContainsAllowedNumberOfDisks
+
+THEOREM Spec => []TypeOK
 
 InvariantOrElseFinished == 
     towers[3] /= CorrectTower

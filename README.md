@@ -10,6 +10,7 @@ In this repo I document my first steps.
 | PlusCal | [QuickSort](PlusCal/QuickSort) |
 | PlusCal | [AlternatingBitProtocol](PlusCal/AlternatingBitProtocol) |
 | PlusCal | [AlternatingBitWithEnvironmentProtocol](PlusCal/AlternatingBitWithEnvironmentProtocol) |
+| PlusCal | [TowersOfHanoi](PlusCal/TowersOfHanoi) |
 | TLA+ | [FarmerCrossesRiver](TLA+/FarmerCrossesRiver) |
 | TLA+ | [SieveOfEratosthenes](TLA+/SieveOfEratosthenes) |
 | TLA+ | [TicTacToe](TLA+/TicTacToe) |
